@@ -9,14 +9,18 @@
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, red, white);
-      height: 100vh;
+      height: 100%;
+    }
+
+    body {
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     .navbar {
@@ -30,6 +34,9 @@
       font-size: 20px;
       font-weight: bold;
       text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     .chat-container {
@@ -46,7 +53,7 @@
       align-items: center;
       text-align: center;
       color: white;
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 500;
     }
 
@@ -96,16 +103,16 @@
 
     input {
       flex: 1;
-      padding: 12px;
+      padding: 14px;
       border-radius: 20px;
       border: none;
-      font-size: 16px;
+      font-size: 18px;
       outline: none;
     }
 
     button {
       margin-left: 10px;
-      padding: 12px 16px;
+      padding: 14px 18px;
       background-color: #ffffff80;
       border: none;
       border-radius: 20px;
@@ -124,10 +131,21 @@
       .message, .warning {
         font-size: 14px;
         padding: 10px 12px;
+        max-width: 90%;
       }
 
       input, button {
-        font-size: 14px;
+        font-size: 16px;
+        padding: 16px;
+      }
+
+      .chat-container.empty {
+        font-size: 22px;
+        padding: 0 20px;
+      }
+
+      body {
+        height: 100dvh;
       }
     }
   </style>
@@ -145,7 +163,7 @@
     <button onclick="jawab()">Kirim</button>
   </div>
 
-  <audio id="sirine" src="https://www.soundjay.com/misc/sounds/buzzer-1.mp3"></audio>
+  <audio id="sirine" src="buzzer.mp3"></audio>
 
   <script>
     const jawabanNdakTau = [
@@ -195,7 +213,9 @@
       for (const kata of kataDilarang) {
         if (lower.includes(kata)) {
           tambahWarning("🚫 Pertanyaan tersebut melanggar ketentuan. 5 menit lagi tukang bakso otw depan rumah anda!");
-          document.getElementById("sirine").play();
+          const sirine = document.getElementById("sirine");
+          sirine.currentTime = 0;
+          sirine.play();
           return;
         }
       }
