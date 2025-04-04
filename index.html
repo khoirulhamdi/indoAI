@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>IndoAI 🤖</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, red, white);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 15px 20px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+    }
+
+    .chat-container.empty {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      margin: 10px 0;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+
+    .user {
+      align-self: flex-end;
+      background-color: rgba(255, 255, 255, 0.8);
+      color: #000;
+      border-bottom-right-radius: 0;
+    }
+
+    .ai {
+      align-self: flex-start;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      border-bottom-left-radius: 0;
+    }
+
+    .warning {
+      align-self: center;
+      background-color: rgba(255, 0, 0, 0.7);
+      color: #fff;
+      font-weight: bold;
+      border-radius: 16px;
+      padding: 12px 16px;
+      margin: 10px 0;
+    }
+
+    .input-area {
+      display: flex;
+      padding: 15px;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 20px;
+      border: none;
+      font-size: 16px;
+      outline: none;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 12px 20px;
+      background-color: #ffffff80;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #000;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">IndoAI</div>
+
+  <div class="chat-container empty" id="chat">
+    <p>Selamat datang di <strong>IndoAI</strong> 👋<br>AI-nya orang Indo. <br> Silakan mulai tanya sesuatu!</p>
+  </div>
+
+  <div class="input-area">
+    <input type="text" id="pertanyaan" placeholder="Tanya sesuatu..." onkeypress="if(event.key==='Enter') jawab()">
+    <button onclick="jawab()">Kirim</button>
+  </div>
+
+  <script>
+    const jawabanNdakTau = [
+      "Ya ndak tau, kok tanya saya?",
+      "Gitu aja kok repot.",
+      "Saya tidak tahu ya...",
+      "Waduh saya belum cek itu.",
+      "Itu urusan kementerian, bukan saya.",
+      "Saya serahkan ke yang berwenang.",
+      "Ya... nanti kita lihat lah.",
+      "Saya kira itu tidak perlu dijawab.",
+      "Itu di luar kewenangan saya.",
+      "Hmm... itu bisa ditanyakan ke yang ahli ya."
+    ];
+
+    const kataDilarang = ["prabowo", "gibran", "jokowi", "mulyono", "fufufafa", "buna teddy"];
+
+    function tambahChat(pesan, kelas) {
+      const chat = document.getElementById("chat");
+      const div = document.createElement("div");
+      div.className = `message ${kelas}`;
+      div.innerText = pesan;
+      chat.appendChild(div);
+      chat.classList.remove("empty");
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function tambahWarning(pesan) {
+      const chat = document.getElementById("chat");
+      const div = document.createElement("div");
+      div.className = "warning";
+      div.innerText = pesan;
+      chat.appendChild(div);
+      chat.classList.remove("empty");
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function jawab() {
+      const input = document.getElementById("pertanyaan");
+      const teks = input.value.trim();
+      if (teks === "") return;
+
+      tambahChat(teks, "user");
+      input.value = "";
+
+      const lower = teks.toLowerCase();
+      for (const kata of kataDilarang) {
+        if (lower.includes(kata)) {
+          tambahWarning("🚫 Pertanyaan tersebut melanggar ketentuan. 5 menit lagi tukang bakso otw depan rumah anda!");
+          return;
+        }
+      }
+
+      let jawaban;
+
+      if (["hi", "halo", "hallo", "hai"].includes(lower)) {
+        jawaban = "Halo juga! Mau tanya apa nih?";
+      } else {
+        jawaban = jawabanNdakTau[Math.floor(Math.random() * jawabanNdakTau.length)];
+      }
+
+      setTimeout(() => {
+        tambahChat(jawaban, "ai");
+        speak(jawaban);
+      }, 600);
+    }
+
+    function speak(text) {
+      const suara = new SpeechSynthesisUtterance(text);
+      suara.lang = "id-ID";
+      const suaraList = window.speechSynthesis.getVoices();
+      const indo = suaraList.find(v => v.lang === "id-ID");
+      if (indo) suara.voice = indo;
+      window.speechSynthesis.speak(suara);
+    }
+
+    window.speechSynthesis.onvoiceschanged = () => {};
+  </script>
+
+</body>
+</html>
